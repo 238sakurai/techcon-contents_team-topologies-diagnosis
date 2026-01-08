@@ -452,16 +452,92 @@ body {
     line-height: 1.5;
 }
 
+/* Share Buttons */
+.share-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    justify-content: center;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.25rem;
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-height: 48px;
+    touch-action: manipulation;
+}
+
+.share-btn:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.share-btn svg {
+    flex-shrink: 0;
+}
+
+/* X (Twitter) Share Button */
+.share-btn.share-x {
+    background: #000;
+    color: #fff;
+    border: 1px solid #333;
+    flex: 1;
+    max-width: 160px;
+}
+
+.share-btn.share-x:hover {
+    background: #1a1a1a;
+    border-color: #555;
+    transform: translateY(-1px);
+}
+
+.share-btn.share-x:active {
+    transform: translateY(0);
+}
+
+/* Copy Button */
+.share-btn.share-copy {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    flex: 1;
+    max-width: 160px;
+}
+
+.share-btn.share-copy:hover {
+    background: var(--color-border);
+    transform: translateY(-1px);
+}
+
+.share-btn.share-copy:active {
+    transform: translateY(0);
+}
+
+.share-btn.share-copy.copied {
+    background: var(--color-yes);
+    color: #0d1117;
+    border-color: var(--color-yes);
+}
+
 .screenshot-hint {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    background: rgba(88, 166, 255, 0.1);
-    border: 1px dashed var(--color-primary);
-    border-radius: var(--radius-sm);
-    font-size: 0.85rem;
-    color: var(--color-primary);
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: none;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
 }
 
 .result-footer {

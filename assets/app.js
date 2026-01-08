@@ -147,6 +147,7 @@ class DiagnosisApp {
     showResult() {
         const resultType = this.determineType();
         const typeInfo = resultTypes[resultType];
+        this.currentResultType = resultType; // シェア用に保存
 
         // プログレスバーを100%に
         this.elements.progress.style.width = '100%';
@@ -161,23 +162,169 @@ class DiagnosisApp {
                 <div class="result-type-label">あなたのチームは...</div>
                 <h2 class="result-type-title">${typeInfo.title}</h2>
                 <p class="result-type-subtitle">${typeInfo.subtitle}</p>
-                
+
                 <ul class="result-features">
                     ${typeInfo.features.map(f => `<li>${f}</li>`).join('')}
                 </ul>
-                
+
                 <div class="result-dress-code">
                     <span class="dress-code-icon">💡</span>
                     <p>${typeInfo.dressCode}</p>
                 </div>
-                
+
+                <div class="share-buttons">
+                    <button type="button" id="share-x-btn" class="share-btn share-x" aria-label="Xでシェア">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                        <span>Xでシェア</span>
+                    </button>
+                    <button type="button" id="copy-result-btn" class="share-btn share-copy" aria-label="結果をコピー">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span>結果をコピー</span>
+                    </button>
+                </div>
+
                 <div class="screenshot-hint">
-                    <span>📸</span> スクショしてSNSでシェア！
+                    <span>📸</span> スクショもOK！
                 </div>
             </div>
         `;
 
+        // シェアボタンのイベントをバインド
+        this.bindShareEvents();
+
         this.showScreen('result');
+    }
+
+    /**
+     * シェアボタンのイベントをバインド
+     */
+    bindShareEvents() {
+        const shareXBtn = document.getElementById('share-x-btn');
+        const copyBtn = document.getElementById('copy-result-btn');
+
+        if (shareXBtn) {
+            shareXBtn.addEventListener('click', () => this.shareToX());
+        }
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => this.copyResult());
+        }
+    }
+
+    /**
+     * シェアURL取得（現在のページURL）
+     */
+    getShareUrl() {
+        // URLパラメータを除いたベースURL
+        return window.location.origin + window.location.pathname;
+    }
+
+    /**
+     * シェアテキスト取得（280文字制限対応）
+     */
+    getShareText(typeInfo) {
+        const baseText = typeInfo.shareText;
+        const url = this.getShareUrl();
+        const maxLength = 280;
+
+        // URL分の文字数を考慮（t.coで23文字に短縮される）
+        const urlLength = 23;
+        const availableLength = maxLength - urlLength - 2; // 改行分
+
+        if (baseText.length <= availableLength) {
+            return baseText;
+        }
+
+        // 長すぎる場合は短縮
+        return baseText.substring(0, availableLength - 3) + '...';
+    }
+
+    /**
+     * Xでシェア（Web Intent）
+     */
+    shareToX() {
+        const typeInfo = resultTypes[this.currentResultType];
+        const text = this.getShareText(typeInfo);
+        const url = this.getShareUrl();
+
+        const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+
+        window.open(intentUrl, '_blank', 'noopener,noreferrer');
+    }
+
+    /**
+     * 結果をクリップボードにコピー
+     */
+    async copyResult() {
+        const typeInfo = resultTypes[this.currentResultType];
+        const text = typeInfo.shareText;
+        const url = this.getShareUrl();
+        const copyText = `${text}\n${url}`;
+
+        const copyBtn = document.getElementById('copy-result-btn');
+
+        try {
+            await navigator.clipboard.writeText(copyText);
+
+            // 成功フィードバック
+            if (copyBtn) {
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>コピーしました！</span>
+                `;
+                copyBtn.classList.add('copied');
+
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }
+        } catch (err) {
+            // フォールバック: 古いブラウザ用
+            this.fallbackCopy(copyText, copyBtn);
+        }
+    }
+
+    /**
+     * クリップボードコピーのフォールバック
+     */
+    fallbackCopy(text, copyBtn) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+
+        try {
+            document.execCommand('copy');
+            if (copyBtn) {
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>コピーしました！</span>
+                `;
+                copyBtn.classList.add('copied');
+
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }
+        } catch (err) {
+            alert('コピーに失敗しました。手動でコピーしてください。');
+        }
+
+        document.body.removeChild(textarea);
     }
 
     saveToLocalStorage(resultType) {

@@ -95,7 +95,8 @@ const resultTypes = {
         ],
         dressCode: "分断が少ない状態は、意識しないと崩れやすい",
         color: "#4CAF50",
-        emoji: "🚀"
+        emoji: "🚀",
+        shareText: "チームトポロジー診断：自律実行型チーム 寄りだった。責務がクリアだと運用が楽になるやつ。"
     },
     B: {
         id: "B",
@@ -108,7 +109,8 @@ const resultTypes = {
         ],
         dressCode: "横断が増えるほど「業務の分断と摩擦」は見えやすくなる",
         color: "#2196F3",
-        emoji: "🌐"
+        emoji: "🌐",
+        shareText: "チームトポロジー診断：横断イネイブリング型 寄りだった。横断が増えるほど分断と摩擦が見える。"
     },
     C: {
         id: "C",
@@ -121,6 +123,7 @@ const resultTypes = {
         ],
         dressCode: "問題は人ではなく、役割や情報の分断にあることが多い",
         color: "#FF9800",
-        emoji: "⚡"
+        emoji: "⚡",
+        shareText: "チームトポロジー診断：分断・属人化ゾーン 寄りだった。問題は人じゃなくて構造、ってやつ。"
     }
 };
