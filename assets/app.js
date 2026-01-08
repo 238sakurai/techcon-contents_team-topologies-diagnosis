@@ -1,11 +1,13 @@
 /**
- * Team Topologies Diagnosis App
+ * Team Topologies 診断アプリ
+ * SRE向け 10問 Yes/No 診断
  */
 
 class DiagnosisApp {
     constructor() {
         this.currentQuestion = 0;
         this.answers = [];
+        this.scores = { A: 0, B: 0, C: 0 };
         this.init();
     }
 
@@ -13,6 +15,7 @@ class DiagnosisApp {
         this.bindElements();
         this.bindEvents();
         this.updateTotalQuestions();
+        this.restoreFromLocalStorage();
     }
 
     bindElements() {
@@ -26,7 +29,8 @@ class DiagnosisApp {
             startBtn: document.getElementById('start-btn'),
             restartBtn: document.getElementById('restart-btn'),
             questionText: document.getElementById('question-text'),
-            options: document.getElementById('options'),
+            yesBtn: document.getElementById('yes-btn'),
+            noBtn: document.getElementById('no-btn'),
             currentQ: document.getElementById('current-q'),
             totalQ: document.getElementById('total-q'),
             progress: document.getElementById('progress'),
@@ -37,6 +41,19 @@ class DiagnosisApp {
     bindEvents() {
         this.elements.startBtn.addEventListener('click', () => this.startDiagnosis());
         this.elements.restartBtn.addEventListener('click', () => this.restart());
+        this.elements.yesBtn.addEventListener('click', () => this.selectAnswer(true));
+        this.elements.noBtn.addEventListener('click', () => this.selectAnswer(false));
+
+        // キーボード操作
+        document.addEventListener('keydown', (e) => {
+            if (!this.screens.question.classList.contains('active')) return;
+            
+            if (e.key === 'y' || e.key === 'Y' || e.key === '1') {
+                this.selectAnswer(true);
+            } else if (e.key === 'n' || e.key === 'N' || e.key === '2') {
+                this.selectAnswer(false);
+            }
+        });
     }
 
     updateTotalQuestions() {
@@ -51,6 +68,7 @@ class DiagnosisApp {
     startDiagnosis() {
         this.currentQuestion = 0;
         this.answers = [];
+        this.scores = { A: 0, B: 0, C: 0 };
         this.showScreen('question');
         this.showQuestion();
     }
@@ -60,34 +78,39 @@ class DiagnosisApp {
         this.elements.currentQ.textContent = this.currentQuestion + 1;
         this.elements.questionText.textContent = question.text;
 
-        // Update progress
+        // プログレスバー更新
         const progressPercent = (this.currentQuestion / questions.length) * 100;
         this.elements.progress.style.width = `${progressPercent}%`;
 
-        // Clear and populate options
-        this.elements.options.innerHTML = '';
-        question.options.forEach((option, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.textContent = option.text;
-            btn.addEventListener('click', () => this.selectOption(index));
-            this.elements.options.appendChild(btn);
-        });
+        // ボタンの選択状態をリセット
+        this.elements.yesBtn.classList.remove('selected');
+        this.elements.noBtn.classList.remove('selected');
+        this.elements.yesBtn.disabled = false;
+        this.elements.noBtn.disabled = false;
     }
 
-    selectOption(index) {
+    selectAnswer(isYes) {
         const question = questions[this.currentQuestion];
+        const selectedBtn = isYes ? this.elements.yesBtn : this.elements.noBtn;
+        
+        // 視覚的フィードバック
+        selectedBtn.classList.add('selected');
+        this.elements.yesBtn.disabled = true;
+        this.elements.noBtn.disabled = true;
+
+        // スコア計算
+        const scoreToAdd = isYes ? question.yesScore : question.noScore;
+        this.scores.A += scoreToAdd.A;
+        this.scores.B += scoreToAdd.B;
+        this.scores.C += scoreToAdd.C;
+
+        // 回答を記録
         this.answers.push({
             questionId: question.id,
-            optionIndex: index,
-            scores: question.options[index].scores
+            answer: isYes
         });
 
-        // Visual feedback
-        const buttons = this.elements.options.querySelectorAll('.option-btn');
-        buttons[index].classList.add('selected');
-
-        // Next question or result
+        // 次の質問へ、または結果表示
         setTimeout(() => {
             if (this.currentQuestion < questions.length - 1) {
                 this.currentQuestion++;
@@ -98,80 +121,94 @@ class DiagnosisApp {
         }, 300);
     }
 
-    calculateResult() {
-        const scores = {
-            streamAligned: 0,
-            enabling: 0,
-            complicated: 0,
-            platform: 0
-        };
+    /**
+     * 判定ロジック（仕様書7.3に準拠）
+     * C_flag >= 2 → Type C
+     * それ以外で B_score >= A_score かつ B_score >= 4 → Type B
+     * それ以外 → Type A
+     */
+    determineType() {
+        const { A, B, C } = this.scores;
 
-        this.answers.forEach(answer => {
-            if (answer.scores) {
-                Object.keys(answer.scores).forEach(key => {
-                    if (scores.hasOwnProperty(key)) {
-                        scores[key] += answer.scores[key];
-                    }
-                });
-            }
-        });
+        // C_flag >= 2 → Type C
+        if (C >= 2) {
+            return 'C';
+        }
 
-        return scores;
+        // B_score >= A_score かつ B_score >= 4 → Type B
+        if (B >= A && B >= 4) {
+            return 'B';
+        }
+
+        // それ以外 → Type A
+        return 'A';
     }
 
     showResult() {
-        const scores = this.calculateResult();
-        const maxScore = Math.max(...Object.values(scores));
-        const resultType = Object.keys(scores).find(key => scores[key] === maxScore);
+        const resultType = this.determineType();
+        const typeInfo = resultTypes[resultType];
 
-        const typeInfo = teamTypes[resultType] || {
-            name: '未定義',
-            description: '診断結果が見つかりませんでした。'
-        };
+        // プログレスバーを100%に
+        this.elements.progress.style.width = '100%';
 
+        // 結果を保存
+        this.saveToLocalStorage(resultType);
+
+        // 結果画面を描画
         this.elements.resultContent.innerHTML = `
-            <div class="result-type">
-                <h3 style="color: var(--color-primary); font-size: 1.5rem; margin-bottom: 1rem;">
-                    ${typeInfo.name}
-                </h3>
-                <p style="margin-bottom: 1.5rem;">${typeInfo.description}</p>
-                <div class="score-breakdown" style="margin-top: 2rem;">
-                    <h4 style="margin-bottom: 1rem; color: var(--color-text-muted);">スコア内訳</h4>
-                    ${this.renderScoreBar('Stream-Aligned', scores.streamAligned, maxScore)}
-                    ${this.renderScoreBar('Enabling', scores.enabling, maxScore)}
-                    ${this.renderScoreBar('Complicated Subsystem', scores.complicated, maxScore)}
-                    ${this.renderScoreBar('Platform', scores.platform, maxScore)}
+            <div class="result-card" style="--type-color: ${typeInfo.color}">
+                <div class="result-emoji">${typeInfo.emoji}</div>
+                <div class="result-type-label">あなたのチームは...</div>
+                <h2 class="result-type-title">${typeInfo.title}</h2>
+                <p class="result-type-subtitle">${typeInfo.subtitle}</p>
+                
+                <ul class="result-features">
+                    ${typeInfo.features.map(f => `<li>${f}</li>`).join('')}
+                </ul>
+                
+                <div class="result-dress-code">
+                    <span class="dress-code-icon">💡</span>
+                    <p>${typeInfo.dressCode}</p>
+                </div>
+                
+                <div class="screenshot-hint">
+                    <span>📸</span> スクショしてSNSでシェア！
                 </div>
             </div>
         `;
 
-        this.elements.progress.style.width = '100%';
         this.showScreen('result');
     }
 
-    renderScoreBar(label, score, maxScore) {
-        const percentage = maxScore > 0 ? (score / maxScore) * 100 : 0;
-        return `
-            <div style="margin-bottom: 0.75rem;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-                    <span style="font-size: 0.9rem;">${label}</span>
-                    <span style="font-size: 0.9rem; color: var(--color-text-muted);">${score}点</span>
-                </div>
-                <div style="background: var(--color-surface-alt); height: 8px; border-radius: 4px; overflow: hidden;">
-                    <div style="width: ${percentage}%; height: 100%; background: linear-gradient(90deg, var(--color-primary), #ff6b6b); transition: width 0.5s ease;"></div>
-                </div>
-            </div>
-        `;
+    saveToLocalStorage(resultType) {
+        try {
+            const data = {
+                resultType,
+                scores: this.scores,
+                answers: this.answers,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('tt-diagnosis-result', JSON.stringify(data));
+        } catch (e) {
+            // localStorage unavailable
+        }
+    }
+
+    restoreFromLocalStorage() {
+        // 今回はリロード時の復元は任意なのでスキップ
+        // 実装する場合はここで復元処理を行う
     }
 
     restart() {
         this.currentQuestion = 0;
         this.answers = [];
+        this.scores = { A: 0, B: 0, C: 0 };
+        this.elements.progress.style.width = '0%';
         this.showScreen('start');
     }
 }
 
-// Initialize app when DOM is ready
+// DOMContentLoaded時にアプリを初期化
 document.addEventListener('DOMContentLoaded', () => {
     new DiagnosisApp();
 });

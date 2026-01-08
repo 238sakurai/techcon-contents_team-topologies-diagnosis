@@ -3,45 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Topologies 診断</title>
+    <meta name="description" content="SRE・Platform・DevOps向け Team Topologies 10問診断。あなたのチームの特性を60秒で可視化！">
+    <title>Team Topologies 診断 | SRE向け10問診断</title>
     <link rel="stylesheet" href="assets/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Team Topologies 診断</h1>
-            <p class="subtitle">あなたのチームの特性を診断します</p>
-        </header>
-
         <main id="app">
+            <!-- スタート画面 -->
             <div id="start-screen" class="screen active">
-                <div class="intro">
-                    <p>このツールは、Team Topologiesの考え方に基づいて、あなたのチームの特性を診断します。</p>
-                    <button id="start-btn" class="btn primary">診断を開始する</button>
+                <div class="start-content">
+                    <div class="logo-area">
+                        <span class="logo-icon">🔍</span>
+                    </div>
+                    <h1 class="main-title">Team Topologies<br>診断</h1>
+                    <p class="main-subtitle">SREあるある × チームタイプ診断</p>
+
+                    <div class="intro-text">
+                        <p>10問のYes/Noで<br>あなたのチームの特性を可視化</p>
+                        <p class="time-hint">⏱ 約60秒で完了</p>
+                    </div>
+
+                    <button type="button" id="start-btn" class="btn primary" aria-label="診断を開始する">
+                        診断スタート
+                    </button>
                 </div>
             </div>
 
+            <!-- 質問画面 -->
             <div id="question-screen" class="screen">
-                <div class="progress-bar">
-                    <div class="progress" id="progress"></div>
-                </div>
-                <div class="question-container">
-                    <p class="question-number">質問 <span id="current-q">1</span> / <span id="total-q">10</span></p>
-                    <h2 id="question-text"></h2>
-                    <div id="options" class="options"></div>
+                <div class="question-wrapper">
+                    <div class="progress-section">
+                        <div class="progress-text">
+                            <span id="current-q">1</span> / <span id="total-q">10</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" id="progress"></div>
+                        </div>
+                    </div>
+
+                    <div class="question-container">
+                        <h2 id="question-text" class="question-text">質問を読み込み中...</h2>
+                    </div>
+
+                    <div class="answer-buttons">
+                        <button type="button" id="yes-btn" class="answer-btn yes" aria-label="Yesを選択">
+                            <span class="answer-label">Yes</span>
+                            <span class="answer-sub">はい</span>
+                        </button>
+                        <button type="button" id="no-btn" class="answer-btn no" aria-label="Noを選択">
+                            <span class="answer-label">No</span>
+                            <span class="answer-sub">いいえ</span>
+                        </button>
+                    </div>
+
+                    <p class="keyboard-hint">キーボード: Y / N でも回答可</p>
                 </div>
             </div>
 
+            <!-- 結果画面 -->
             <div id="result-screen" class="screen">
-                <h2>診断結果</h2>
-                <div id="result-content"></div>
-                <button id="restart-btn" class="btn secondary">もう一度診断する</button>
+                <div class="result-wrapper">
+                    <div id="result-content"></div>
+
+                    <button type="button" id="restart-btn" class="btn secondary" aria-label="もう一度診断する">
+                        🔄 もう一回
+                    </button>
+                </div>
+
+                <footer class="result-footer">
+                    <p>Team Topologies Diagnosis</p>
+                </footer>
             </div>
         </main>
-
-        <footer>
-            <p>&copy; 2026 Team Topologies Diagnosis</p>
-        </footer>
     </div>
 
     <script src="assets/questions.js"></script>
