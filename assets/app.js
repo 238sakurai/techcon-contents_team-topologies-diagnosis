@@ -1,11 +1,14 @@
 /**
- * Team Topologies Diagnosis App
+ * Team Topologies 診断 App
+ * SRE向け・Dress Code文脈
+ * 10問 Yes/No 形式
  */
 
 class DiagnosisApp {
     constructor() {
         this.currentQuestion = 0;
         this.answers = [];
+        this.scores = { A: 0, B: 0, C: 0 };
         this.init();
     }
 
@@ -37,6 +40,17 @@ class DiagnosisApp {
     bindEvents() {
         this.elements.startBtn.addEventListener('click', () => this.startDiagnosis());
         this.elements.restartBtn.addEventListener('click', () => this.restart());
+        
+        // キーボード操作対応
+        document.addEventListener('keydown', (e) => {
+            if (this.screens.question.classList.contains('active')) {
+                if (e.key === 'y' || e.key === 'Y') {
+                    this.selectAnswer(true);
+                } else if (e.key === 'n' || e.key === 'N') {
+                    this.selectAnswer(false);
+                }
+            }
+        });
     }
 
     updateTotalQuestions() {
@@ -51,6 +65,7 @@ class DiagnosisApp {
     startDiagnosis() {
         this.currentQuestion = 0;
         this.answers = [];
+        this.scores = { A: 0, B: 0, C: 0 };
         this.showScreen('question');
         this.showQuestion();
     }
@@ -64,28 +79,46 @@ class DiagnosisApp {
         const progressPercent = (this.currentQuestion / questions.length) * 100;
         this.elements.progress.style.width = `${progressPercent}%`;
 
-        // Clear and populate options
-        this.elements.options.innerHTML = '';
-        question.options.forEach((option, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.textContent = option.text;
-            btn.addEventListener('click', () => this.selectOption(index));
-            this.elements.options.appendChild(btn);
-        });
+        // Yes/No ボタンを生成
+        this.elements.options.innerHTML = `
+            <button class="option-btn yes-btn" aria-label="Yes" data-answer="yes">
+                <span class="btn-icon">○</span>
+                <span class="btn-text">Yes</span>
+            </button>
+            <button class="option-btn no-btn" aria-label="No" data-answer="no">
+                <span class="btn-icon">×</span>
+                <span class="btn-text">No</span>
+            </button>
+        `;
+
+        // イベントリスナー追加
+        this.elements.options.querySelector('.yes-btn').addEventListener('click', () => this.selectAnswer(true));
+        this.elements.options.querySelector('.no-btn').addEventListener('click', () => this.selectAnswer(false));
     }
 
-    selectOption(index) {
+    selectAnswer(isYes) {
         const question = questions[this.currentQuestion];
+        const answerKey = isYes ? 'yes' : 'no';
+        
+        // スコア加算
+        const scoring = question.scoring[answerKey];
+        this.scores.A += scoring.A;
+        this.scores.B += scoring.B;
+        this.scores.C += scoring.C;
+
+        // 回答記録
         this.answers.push({
             questionId: question.id,
-            optionIndex: index,
-            scores: question.options[index].scores
+            answer: isYes
         });
 
         // Visual feedback
         const buttons = this.elements.options.querySelectorAll('.option-btn');
-        buttons[index].classList.add('selected');
+        buttons.forEach(btn => btn.disabled = true);
+        const selectedBtn = isYes 
+            ? this.elements.options.querySelector('.yes-btn')
+            : this.elements.options.querySelector('.no-btn');
+        selectedBtn.classList.add('selected');
 
         // Next question or result
         setTimeout(() => {
@@ -95,52 +128,41 @@ class DiagnosisApp {
             } else {
                 this.showResult();
             }
-        }, 300);
-    }
-
-    calculateResult() {
-        const scores = {
-            streamAligned: 0,
-            enabling: 0,
-            complicated: 0,
-            platform: 0
-        };
-
-        this.answers.forEach(answer => {
-            if (answer.scores) {
-                Object.keys(answer.scores).forEach(key => {
-                    if (scores.hasOwnProperty(key)) {
-                        scores[key] += answer.scores[key];
-                    }
-                });
-            }
-        });
-
-        return scores;
+        }, 250);
     }
 
     showResult() {
-        const scores = this.calculateResult();
-        const maxScore = Math.max(...Object.values(scores));
-        const resultType = Object.keys(scores).find(key => scores[key] === maxScore);
+        // タイプ判定
+        const resultType = determineType(this.scores);
+        const typeInfo = teamTypes[resultType];
 
-        const typeInfo = teamTypes[resultType] || {
-            name: '未定義',
-            description: '診断結果が見つかりませんでした。'
-        };
-
+        // 結果画面描画（スクショ映え重視・1画面完結）
         this.elements.resultContent.innerHTML = `
-            <div class="result-type">
-                <h3 style="color: var(--color-primary); font-size: 1.5rem; margin-bottom: 1rem;">
-                    ${typeInfo.name}
-                </h3>
-                <p style="margin-bottom: 1.5rem;">${typeInfo.description}</p>
-                <div class="score-breakdown" style="margin-top: 2rem;">
-                    <h4 style="margin-bottom: 1rem; color: var(--color-text-muted);">スコア内訳</h4>
-                    ${this.renderScoreBar('Stream-Aligned', scores.streamAligned, maxScore)}
-                    ${this.renderScoreBar('Enabling', scores.enabling, maxScore)}
-                    ${this.renderScoreBar('Complicated Subsystem', scores.complicated, maxScore)}
-                    ${this.renderScoreBar('Platform', scores.platform, maxScore)}
+            <div class="result-card" style="--type-color: ${typeInfo.color}">
+                <div class="result-header">
+                    <div class="result-label">あなたのチームは...</div>
+                    <h3 class="result-type-name">
+                        ${typeInfo.name}
+                        <span class="result-suffix">${typeInfo.suffix}</span>
+                    </h3>
+                </div>
+                
+                <div class="result-features">
+                    ${typeInfo.features.map(f => `
+                        <div class="feature-item">
+                            <span class="feature-check">✓</span>
+                            <span>${f}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="result-context ${typeInfo.isWarning ? 'is-warning' : ''}">
+                    <p>${typeInfo.dressCodeContext}</p>
+                </div>
+                
+                <div class="result-footer">
+                    <p class="screenshot-hint">📸 スクショしてXで共有OK！</p>
+                    <p class="brand-small">Team Topologies Diagnosis by Dress Code</p>
                 </div>
             </div>
         `;
@@ -149,24 +171,10 @@ class DiagnosisApp {
         this.showScreen('result');
     }
 
-    renderScoreBar(label, score, maxScore) {
-        const percentage = maxScore > 0 ? (score / maxScore) * 100 : 0;
-        return `
-            <div style="margin-bottom: 0.75rem;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-                    <span style="font-size: 0.9rem;">${label}</span>
-                    <span style="font-size: 0.9rem; color: var(--color-text-muted);">${score}点</span>
-                </div>
-                <div style="background: var(--color-surface-alt); height: 8px; border-radius: 4px; overflow: hidden;">
-                    <div style="width: ${percentage}%; height: 100%; background: linear-gradient(90deg, var(--color-primary), #ff6b6b); transition: width 0.5s ease;"></div>
-                </div>
-            </div>
-        `;
-    }
-
     restart() {
         this.currentQuestion = 0;
         this.answers = [];
+        this.scores = { A: 0, B: 0, C: 0 };
         this.showScreen('start');
     }
 }
