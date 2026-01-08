@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Topologies 診断</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Team Topologies 診断</h1>
+            <p class="subtitle">あなたのチームの特性を診断します</p>
+        </header>
+
+        <main id="app">
+            <div id="start-screen" class="screen active">
+                <div class="intro">
+                    <p>このツールは、Team Topologiesの考え方に基づいて、あなたのチームの特性を診断します。</p>
+                    <button id="start-btn" class="btn primary">診断を開始する</button>
+                </div>
+            </div>
+
+            <div id="question-screen" class="screen">
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+                <div class="question-container">
+                    <p class="question-number">質問 <span id="current-q">1</span> / <span id="total-q">10</span></p>
+                    <h2 id="question-text"></h2>
+                    <div id="options" class="options"></div>
+                </div>
+            </div>
+
+            <div id="result-screen" class="screen">
+                <h2>診断結果</h2>
+                <div id="result-content"></div>
+                <button id="restart-btn" class="btn secondary">もう一度診断する</button>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Team Topologies Diagnosis</p>
+        </footer>
+    </div>
+
+    <script src="assets/questions.js"></script>
+    <script src="assets/app.js"></script>
+</body>
+</html>
