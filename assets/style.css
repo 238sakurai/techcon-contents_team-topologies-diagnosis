@@ -1,29 +1,114 @@
 /* ========================================
-   Team Topologies 診断 - SRE向け・Dress Code文脈
-   スマホスクショ映え・縦長レイアウト対応
+   Team Topologies 診断 - Dress Code Design System
+   SRE向け・Dress Code文脈
    ======================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
-
+/* ----------------------------------------
+   Dress Code Design Tokens
+   ---------------------------------------- */
 :root {
-    --color-bg: #0a0a12;
-    --color-surface: #12121f;
-    --color-surface-alt: #1a1a2e;
-    --color-border: #2a2a42;
-    --color-primary: #e94560;
-    --color-primary-glow: rgba(233, 69, 96, 0.25);
-    --color-text: #f0f0f5;
-    --color-text-muted: #8888a0;
-    --color-success: #4CAF50;
-    --color-info: #2196F3;
-    --color-warning: #FF9800;
-    --font-primary: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
-    --transition-fast: 0.15s ease;
-    --transition-normal: 0.25s ease;
-    --btn-min-height: 48px; /* アクセシビリティ: 44px以上 */
+    /* Primary Colors - Deep Blue */
+    --dc-primary-fill: #192041;
+    --dc-primary-fill-hover: #2d3558;
+    --dc-primary-on-fill: #ffffff;
+    --dc-primary-muted-fill: #edf1fb;
+    --dc-primary-on-muted-fill: #1d2445;
+    --dc-primary-border: #bac7f3;
+
+    /* Secondary Colors - Water Blue */
+    --dc-secondary-fill: #7b8797;
+    --dc-secondary-fill-hover: #6f7b8b;
+    --dc-secondary-on-fill: #fcfcfd;
+    --dc-secondary-muted-fill: #edf1f6;
+    --dc-secondary-on-muted-fill: #1b2432;
+
+    /* Semantic Colors */
+    --dc-success-fill: #18794e;
+    --dc-success-on-fill: #f7fffb;
+    --dc-success-muted-fill: #ddf3e4;
+    --dc-success-on-muted-fill: #193b2d;
+    --dc-success-border: #92ceac;
+
+    --dc-error-fill: #d6282d;
+    --dc-error-on-fill: #fff8f8;
+    --dc-error-muted-fill: #ffe5e5;
+    --dc-error-on-muted-fill: #641723;
+    --dc-error-border: #f3aeaf;
+
+    --dc-warning-fill: #ffba1a;
+    --dc-warning-on-fill: #3b2516;
+    --dc-warning-muted-fill: #ffecb7;
+    --dc-warning-on-muted-fill: #4f3422;
+    --dc-warning-border: #e4bb78;
+
+    /* Neutral Colors */
+    --dc-neutral-fill: #fcfcfd;
+    --dc-neutral-fill-2: #f9f9fa;
+    --dc-neutral-fill-3: #f0f0f1;
+    --dc-neutral-fill-5: #e0e0e3;
+    --dc-neutral-on-fill: #1f1f22;
+    --dc-neutral-muted-on-fill: #646467;
+    --dc-neutral-border: #8d8d91;
+    --dc-neutral-muted-border: #bbbbbf;
+    --dc-neutral-bottom-fill: #f0f0f1;
+
+    /* Typography */
+    --dc-font-family: "Open Sans", system-ui, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Segoe UI", YuGothic, "Yu Gothic", "Meiryo", sans-serif;
+    --dc-font-weight-regular: 400;
+    --dc-font-weight-semibold: 600;
+    --dc-font-weight-bold: 700;
+
+    /* Font Sizes */
+    --dc-font-size-12: 0.75rem;
+    --dc-font-size-14: 0.875rem;
+    --dc-font-size-16: 1rem;
+    --dc-font-size-18: 1.125rem;
+    --dc-font-size-20: 1.25rem;
+    --dc-font-size-24: 1.5rem;
+    --dc-font-size-30: 1.875rem;
+
+    /* Line Heights */
+    --dc-line-height-120: 1.2;
+    --dc-line-height-140: 1.4;
+    --dc-line-height-160: 1.6;
+
+    /* Spacing */
+    --dc-spacing-4: 4px;
+    --dc-spacing-8: 8px;
+    --dc-spacing-12: 12px;
+    --dc-spacing-16: 16px;
+    --dc-spacing-20: 20px;
+    --dc-spacing-24: 24px;
+    --dc-spacing-32: 32px;
+    --dc-spacing-48: 48px;
+
+    /* Border Radius */
+    --dc-rounded-sm: 4px;
+    --dc-rounded-md: 6px;
+    --dc-rounded-lg: 8px;
+    --dc-rounded-xl: 12px;
+    --dc-rounded-full: 9999px;
+
+    /* Shadows */
+    --dc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --dc-shadow-md: 0 1px 2px -1px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1);
+    --dc-shadow-lg: 0 2px 4px -2px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --dc-shadow-xl: 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+    /* Transitions */
+    --dc-transition-fast: 150ms ease;
+    --dc-transition-normal: 250ms ease;
+
+    /* Component Sizes */
+    --dc-btn-min-height: 48px;
 }
 
-* {
+/* ----------------------------------------
+   Reset & Base Styles
+   ---------------------------------------- */
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -31,61 +116,71 @@
 
 html {
     font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-    font-family: var(--font-primary);
-    background: var(--color-bg);
-    color: var(--color-text);
+    font-family: var(--dc-font-family);
+    background: var(--dc-neutral-fill);
+    color: var(--dc-neutral-on-fill);
     min-height: 100vh;
-    line-height: 1.6;
+    line-height: var(--dc-line-height-160);
+    /* Subtle gradient background */
     background-image: 
-        radial-gradient(ellipse at 30% 0%, rgba(233, 69, 96, 0.06) 0%, transparent 50%),
-        radial-gradient(ellipse at 70% 100%, rgba(33, 150, 243, 0.06) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 0%, rgba(25, 32, 65, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(123, 135, 151, 0.03) 0%, transparent 50%);
 }
 
-/* Container - 縦長レイアウト */
+/* ----------------------------------------
+   Container - 縦長レイアウト
+   ---------------------------------------- */
 .container {
     max-width: 480px;
     margin: 0 auto;
-    padding: 1.5rem 1rem;
+    padding: var(--dc-spacing-24) var(--dc-spacing-16);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
-/* Header */
+/* ----------------------------------------
+   Header
+   ---------------------------------------- */
 header {
     text-align: center;
-    padding: 1.5rem 0 1rem;
+    padding: var(--dc-spacing-24) 0 var(--dc-spacing-16);
     flex-shrink: 0;
 }
 
 header h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--color-primary) 0%, #ff6b6b 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 0.25rem;
+    font-size: var(--dc-font-size-24);
+    font-weight: var(--dc-font-weight-bold);
+    color: var(--dc-primary-fill);
+    margin-bottom: var(--dc-spacing-4);
+    line-height: var(--dc-line-height-120);
 }
 
 .subtitle {
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
+    color: var(--dc-neutral-muted-on-fill);
+    font-size: var(--dc-font-size-14);
+    font-weight: var(--dc-font-weight-regular);
 }
 
-/* Main */
+/* ----------------------------------------
+   Main
+   ---------------------------------------- */
 main {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem 0;
+    padding: var(--dc-spacing-16) 0;
 }
 
-/* Screens */
+/* ----------------------------------------
+   Screens
+   ---------------------------------------- */
 .screen {
     display: none;
     width: 100%;
@@ -97,197 +192,212 @@ main {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-/* ========================================
+/* ----------------------------------------
    Start Screen
-   ======================================== */
+   ---------------------------------------- */
 .intro {
     text-align: center;
-    padding: 2rem 1.5rem;
-    background: var(--color-surface);
-    border-radius: 16px;
-    border: 1px solid var(--color-border);
+    padding: var(--dc-spacing-32) var(--dc-spacing-24);
+    background: var(--dc-neutral-fill);
+    border-radius: var(--dc-rounded-xl);
+    border: 1px solid var(--dc-neutral-muted-border);
+    box-shadow: var(--dc-shadow-md);
 }
 
 .intro p {
-    font-size: 0.95rem;
-    margin-bottom: 1.5rem;
-    color: var(--color-text-muted);
-    line-height: 1.7;
+    font-size: var(--dc-font-size-16);
+    margin-bottom: var(--dc-spacing-24);
+    color: var(--dc-neutral-muted-on-fill);
+    line-height: var(--dc-line-height-160);
 }
 
-/* ========================================
-   Buttons - アクセシビリティ対応
-   ======================================== */
+/* ----------------------------------------
+   Buttons - Dress Code Style
+   ---------------------------------------- */
 .btn {
-    min-height: var(--btn-min-height);
-    padding: 0.875rem 2rem;
-    font-size: 1rem;
-    font-weight: 600;
+    min-height: var(--dc-btn-min-height);
+    padding: var(--dc-spacing-12) var(--dc-spacing-32);
+    font-size: var(--dc-font-size-14);
+    font-weight: var(--dc-font-weight-semibold);
     border: none;
-    border-radius: 12px;
+    border-radius: var(--dc-rounded-lg);
     cursor: pointer;
-    transition: all var(--transition-normal);
-    font-family: var(--font-primary);
-    touch-action: manipulation; /* タップ遅延防止 */
+    transition: all var(--dc-transition-normal);
+    font-family: var(--dc-font-family);
+    touch-action: manipulation;
+    line-height: var(--dc-line-height-140);
 }
 
 .btn:focus {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid var(--dc-primary-fill);
+    outline-offset: 2px;
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--dc-primary-fill);
     outline-offset: 2px;
 }
 
 .btn.primary {
-    background: linear-gradient(135deg, var(--color-primary) 0%, #ff6b6b 100%);
-    color: white;
-    box-shadow: 0 4px 16px var(--color-primary-glow);
+    background: var(--dc-primary-fill);
+    color: var(--dc-primary-on-fill);
+    box-shadow: var(--dc-shadow-md);
 }
 
-.btn.primary:hover,
-.btn.primary:focus {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px var(--color-primary-glow);
+.btn.primary:hover {
+    background: var(--dc-primary-fill-hover);
+    box-shadow: var(--dc-shadow-lg);
+    transform: translateY(-1px);
 }
 
 .btn.primary:active {
     transform: translateY(0);
+    box-shadow: var(--dc-shadow-sm);
 }
 
 .btn.secondary {
-    background: var(--color-surface-alt);
-    color: var(--color-text);
-    border: 1px solid var(--color-primary);
+    background: var(--dc-neutral-fill);
+    color: var(--dc-primary-fill);
+    border: 1px solid var(--dc-primary-border);
 }
 
-.btn.secondary:hover,
-.btn.secondary:focus {
-    background: rgba(233, 69, 96, 0.15);
+.btn.secondary:hover {
+    background: var(--dc-primary-muted-fill);
 }
 
-/* ========================================
+/* ----------------------------------------
    Question Screen
-   ======================================== */
+   ---------------------------------------- */
 .progress-bar {
     width: 100%;
     height: 4px;
-    background: var(--color-surface-alt);
+    background: var(--dc-neutral-fill-5);
     border-radius: 2px;
     overflow: hidden;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--dc-spacing-24);
 }
 
 .progress {
     height: 100%;
-    background: linear-gradient(90deg, var(--color-primary), #ff6b6b);
-    transition: width var(--transition-normal);
+    background: var(--dc-primary-fill);
+    transition: width var(--dc-transition-normal);
     border-radius: 2px;
 }
 
 .question-container {
-    background: var(--color-surface);
-    padding: 1.5rem;
-    border-radius: 16px;
-    border: 1px solid var(--color-border);
+    background: var(--dc-neutral-fill);
+    padding: var(--dc-spacing-24);
+    border-radius: var(--dc-rounded-xl);
+    border: 1px solid var(--dc-neutral-muted-border);
+    box-shadow: var(--dc-shadow-md);
 }
 
 .question-number {
-    color: var(--color-text-muted);
-    font-size: 0.85rem;
-    margin-bottom: 0.75rem;
-    font-weight: 500;
+    color: var(--dc-neutral-muted-on-fill);
+    font-size: var(--dc-font-size-12);
+    margin-bottom: var(--dc-spacing-8);
+    font-weight: var(--dc-font-weight-semibold);
 }
 
 #question-text {
-    font-size: 1.15rem;
-    font-weight: 500;
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
+    font-size: var(--dc-font-size-18);
+    font-weight: var(--dc-font-weight-semibold);
+    margin-bottom: var(--dc-spacing-24);
+    line-height: var(--dc-line-height-160);
+    color: var(--dc-neutral-on-fill);
 }
 
-/* ========================================
-   Yes/No Options - 大きなタップ領域
-   ======================================== */
+/* ----------------------------------------
+   Yes/No Options
+   ---------------------------------------- */
 .options {
     display: flex;
-    gap: 1rem;
+    gap: var(--dc-spacing-16);
 }
 
 .option-btn {
     flex: 1;
     min-height: 72px;
-    padding: 1rem;
-    background: var(--color-surface-alt);
-    border: 2px solid var(--color-border);
-    border-radius: 16px;
-    color: var(--color-text);
+    padding: var(--dc-spacing-16);
+    background: var(--dc-neutral-fill);
+    border: 2px solid var(--dc-neutral-muted-border);
+    border-radius: var(--dc-rounded-xl);
+    color: var(--dc-neutral-on-fill);
     cursor: pointer;
-    transition: all var(--transition-fast);
-    font-family: var(--font-primary);
+    transition: all var(--dc-transition-fast);
+    font-family: var(--dc-font-family);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.25rem;
+    gap: var(--dc-spacing-4);
     touch-action: manipulation;
 }
 
 .option-btn:focus {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid var(--dc-primary-fill);
     outline-offset: 2px;
 }
 
 .option-btn .btn-icon {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: var(--dc-font-size-24);
+    font-weight: var(--dc-font-weight-bold);
     line-height: 1;
 }
 
 .option-btn .btn-text {
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: var(--dc-font-size-14);
+    font-weight: var(--dc-font-weight-semibold);
 }
 
-/* Yes Button */
+/* Yes Button - Success Color */
 .option-btn.yes-btn {
-    border-color: var(--color-success);
+    border-color: var(--dc-success-border);
 }
 
 .option-btn.yes-btn .btn-icon {
-    color: var(--color-success);
+    color: var(--dc-success-fill);
 }
 
 .option-btn.yes-btn:hover,
 .option-btn.yes-btn:focus {
-    background: rgba(76, 175, 80, 0.15);
+    background: var(--dc-success-muted-fill);
     transform: scale(1.02);
 }
 
 .option-btn.yes-btn.selected {
-    background: rgba(76, 175, 80, 0.25);
-    border-color: var(--color-success);
+    background: var(--dc-success-muted-fill);
+    border-color: var(--dc-success-fill);
 }
 
-/* No Button */
+/* No Button - Error Color */
 .option-btn.no-btn {
-    border-color: var(--color-primary);
+    border-color: var(--dc-error-border);
 }
 
 .option-btn.no-btn .btn-icon {
-    color: var(--color-primary);
+    color: var(--dc-error-fill);
 }
 
 .option-btn.no-btn:hover,
 .option-btn.no-btn:focus {
-    background: rgba(233, 69, 96, 0.15);
+    background: var(--dc-error-muted-fill);
     transform: scale(1.02);
 }
 
 .option-btn.no-btn.selected {
-    background: rgba(233, 69, 96, 0.25);
-    border-color: var(--color-primary);
+    background: var(--dc-error-muted-fill);
+    border-color: var(--dc-error-fill);
 }
 
 .option-btn:disabled {
@@ -295,70 +405,73 @@ main {
     transform: none;
 }
 
-/* ========================================
-   Result Screen - スクショ映え・1画面完結
-   ======================================== */
+/* ----------------------------------------
+   Result Screen
+   ---------------------------------------- */
 #result-screen {
     text-align: center;
 }
 
 #result-screen h2 {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
-    color: var(--color-text-muted);
+    font-size: var(--dc-font-size-18);
+    margin-bottom: var(--dc-spacing-16);
+    color: var(--dc-neutral-muted-on-fill);
+    font-weight: var(--dc-font-weight-semibold);
 }
 
 #result-content {
-    margin-bottom: 1.25rem;
+    margin-bottom: var(--dc-spacing-20);
 }
 
-/* Result Card - スクショ用 */
+/* Result Card */
 .result-card {
-    background: var(--color-surface);
-    border-radius: 20px;
-    border: 1px solid var(--color-border);
+    background: var(--dc-neutral-fill);
+    border-radius: var(--dc-rounded-xl);
+    border: 1px solid var(--dc-neutral-muted-border);
     overflow: hidden;
     text-align: left;
+    box-shadow: var(--dc-shadow-lg);
 }
 
 .result-header {
-    padding: 1.5rem 1.5rem 1rem;
-    background: linear-gradient(135deg, var(--color-surface-alt) 0%, var(--color-surface) 100%);
-    border-bottom: 1px solid var(--color-border);
+    padding: var(--dc-spacing-24) var(--dc-spacing-24) var(--dc-spacing-16);
+    background: var(--dc-neutral-fill-2);
+    border-bottom: 1px solid var(--dc-neutral-muted-border);
     text-align: center;
 }
 
 .result-label {
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
-    margin-bottom: 0.5rem;
+    font-size: var(--dc-font-size-12);
+    color: var(--dc-neutral-muted-on-fill);
+    margin-bottom: var(--dc-spacing-8);
+    font-weight: var(--dc-font-weight-semibold);
 }
 
 .result-type-name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--type-color, var(--color-primary));
-    line-height: 1.3;
+    font-size: var(--dc-font-size-24);
+    font-weight: var(--dc-font-weight-bold);
+    color: var(--type-color, var(--dc-primary-fill));
+    line-height: var(--dc-line-height-120);
 }
 
 .result-suffix {
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--color-text-muted);
-    margin-left: 0.25rem;
+    font-size: var(--dc-font-size-16);
+    font-weight: var(--dc-font-weight-regular);
+    color: var(--dc-neutral-muted-on-fill);
+    margin-left: var(--dc-spacing-4);
 }
 
 .result-features {
-    padding: 1.25rem 1.5rem;
+    padding: var(--dc-spacing-20) var(--dc-spacing-24);
 }
 
 .feature-item {
     display: flex;
     align-items: flex-start;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    font-size: 0.95rem;
-    line-height: 1.5;
+    gap: var(--dc-spacing-12);
+    margin-bottom: var(--dc-spacing-12);
+    font-size: var(--dc-font-size-14);
+    line-height: var(--dc-line-height-160);
 }
 
 .feature-item:last-child {
@@ -366,53 +479,57 @@ main {
 }
 
 .feature-check {
-    color: var(--type-color, var(--color-success));
-    font-weight: 700;
+    color: var(--type-color, var(--dc-success-fill));
+    font-weight: var(--dc-font-weight-bold);
     flex-shrink: 0;
 }
 
 .result-context {
-    padding: 1rem 1.5rem;
-    background: var(--color-surface-alt);
-    border-top: 1px solid var(--color-border);
+    padding: var(--dc-spacing-16) var(--dc-spacing-24);
+    background: var(--dc-neutral-fill-3);
+    border-top: 1px solid var(--dc-neutral-muted-border);
 }
 
 .result-context p {
-    font-size: 0.85rem;
-    color: var(--color-text-muted);
-    line-height: 1.6;
+    font-size: var(--dc-font-size-14);
+    color: var(--dc-neutral-muted-on-fill);
+    line-height: var(--dc-line-height-160);
     font-style: italic;
 }
 
+.result-context.is-warning {
+    background: var(--dc-warning-muted-fill);
+}
+
 .result-context.is-warning p {
-    color: var(--color-warning);
+    color: var(--dc-warning-on-muted-fill);
     font-style: normal;
-    font-weight: 500;
+    font-weight: var(--dc-font-weight-semibold);
 }
 
 .result-footer {
-    padding: 1rem 1.5rem;
+    padding: var(--dc-spacing-16) var(--dc-spacing-24);
     text-align: center;
-    border-top: 1px solid var(--color-border);
+    border-top: 1px solid var(--dc-neutral-muted-border);
 }
 
 .screenshot-hint {
-    font-size: 0.85rem;
-    color: var(--color-text);
-    margin-bottom: 0.5rem;
+    font-size: var(--dc-font-size-14);
+    color: var(--dc-neutral-on-fill);
+    margin-bottom: var(--dc-spacing-8);
 }
 
 .brand-small {
-    font-size: 0.7rem;
-    color: var(--color-text-muted);
+    font-size: var(--dc-font-size-12);
+    color: var(--dc-neutral-muted-on-fill);
     opacity: 0.7;
 }
 
-/* ========================================
-   X (Twitter) Share Section
-   ======================================== */
+/* ----------------------------------------
+   Share Section
+   ---------------------------------------- */
 .share-section {
-    margin-top: 1.25rem;
+    margin-top: var(--dc-spacing-20);
     text-align: center;
 }
 
@@ -420,24 +537,25 @@ main {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    background: #000;
-    color: #fff;
-    border: 1px solid #333;
-    padding: 0.875rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 9999px; /* Pill shape like X's buttons */
+    gap: var(--dc-spacing-8);
+    background: var(--dc-neutral-on-fill);
+    color: var(--dc-neutral-fill);
+    border: none;
+    padding: var(--dc-spacing-12) var(--dc-spacing-24);
+    font-size: var(--dc-font-size-14);
+    font-weight: var(--dc-font-weight-semibold);
+    border-radius: var(--dc-rounded-full);
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: all var(--dc-transition-fast);
     touch-action: manipulation;
+    box-shadow: var(--dc-shadow-md);
 }
 
 .share-btn:hover,
 .share-btn:focus {
-    background: #1a1a1a;
+    background: var(--dc-primary-fill-hover);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--dc-shadow-lg);
 }
 
 .share-btn:active {
@@ -449,42 +567,42 @@ main {
 }
 
 .share-note {
-    font-size: 0.75rem;
-    color: var(--color-text-muted);
-    margin-top: 0.75rem;
+    font-size: var(--dc-font-size-12);
+    color: var(--dc-neutral-muted-on-fill);
+    margin-top: var(--dc-spacing-12);
 }
 
-/* ========================================
+/* ----------------------------------------
    Footer
-   ======================================== */
+   ---------------------------------------- */
 footer {
     text-align: center;
-    padding: 1rem 0;
-    color: var(--color-text-muted);
-    font-size: 0.75rem;
+    padding: var(--dc-spacing-16) 0;
+    color: var(--dc-neutral-muted-on-fill);
+    font-size: var(--dc-font-size-12);
     flex-shrink: 0;
 }
 
-/* ========================================
-   Responsive - スマホ最適化
-   ======================================== */
+/* ----------------------------------------
+   Responsive - Mobile
+   ---------------------------------------- */
 @media (max-width: 480px) {
     .container {
-        padding: 1rem 0.75rem;
+        padding: var(--dc-spacing-16) var(--dc-spacing-12);
     }
 
     header h1 {
-        font-size: 1.35rem;
+        font-size: var(--dc-font-size-20);
     }
 
     .question-container,
     .intro {
-        padding: 1.25rem;
-        border-radius: 12px;
+        padding: var(--dc-spacing-20);
+        border-radius: var(--dc-rounded-lg);
     }
 
     #question-text {
-        font-size: 1.05rem;
+        font-size: var(--dc-font-size-16);
     }
 
     .option-btn {
@@ -492,27 +610,29 @@ footer {
     }
 
     .result-type-name {
-        font-size: 1.3rem;
+        font-size: var(--dc-font-size-20);
     }
 }
 
-/* iPad / Tablet */
+/* ----------------------------------------
+   Responsive - Tablet+
+   ---------------------------------------- */
 @media (min-width: 768px) {
     .container {
-        padding: 2rem;
+        padding: var(--dc-spacing-32);
     }
 
     header {
-        padding: 2rem 0 1.5rem;
+        padding: var(--dc-spacing-32) 0 var(--dc-spacing-24);
     }
 
     header h1 {
-        font-size: 1.75rem;
+        font-size: var(--dc-font-size-30);
     }
 
     .intro,
     .question-container {
-        padding: 2rem;
+        padding: var(--dc-spacing-32);
     }
 
     .option-btn {
@@ -520,20 +640,20 @@ footer {
     }
 
     .option-btn .btn-icon {
-        font-size: 1.75rem;
+        font-size: var(--dc-font-size-30);
     }
 }
 
-/* ========================================
-   Print / Screenshot optimization
-   ======================================== */
+/* ----------------------------------------
+   Print / Screenshot Optimization
+   ---------------------------------------- */
 @media print {
     body {
         background: white;
-        color: black;
     }
-    
+
     .result-card {
-        border: 2px solid #333;
+        border: 2px solid var(--dc-neutral-border);
+        box-shadow: none;
     }
 }

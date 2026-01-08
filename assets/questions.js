@@ -94,6 +94,13 @@ function determineType(scores) {
  * タイプ定義（結果画面文言）
  * スクショ映え優先の固定文言
  */
+/**
+ * タイプ定義（結果画面文言）
+ * Dress Code Design System カラー適用
+ * - Type A: Success (#18794e) - 緑
+ * - Type B: Primary (#192041) - Deep Blue
+ * - Type C: Error (#d6282d) - 赤
+ */
 const teamTypes = {
     A: {
         name: '自律実行型チーム',
@@ -104,7 +111,7 @@ const teamTypes = {
             '改善サイクルを自走できる'
         ],
         dressCodeContext: '分断が少ない状態は、意識しないと崩れやすい',
-        color: '#4CAF50'  // 緑系
+        color: '#18794e'  // Dress Code Success
     },
     B: {
         name: '横断イネーブリング型',
@@ -115,7 +122,7 @@ const teamTypes = {
             '仕組み化や勉強会で周りを強くする'
         ],
         dressCodeContext: '横断が増えるほど「業務の分断と摩擦」は見えやすくなる',
-        color: '#2196F3'  // 青系
+        color: '#192041'  // Dress Code Primary (Deep Blue)
     },
     C: {
         name: '分断・属人化ゾーン',
@@ -125,9 +132,8 @@ const teamTypes = {
             '相談が集中しやすい',
             '構造より気合で回りがち'
         ],
-        // 注意書き（必須）- 否定にならないトーン
         dressCodeContext: '問題は人ではなく、役割や情報の分断にあることが多い',
-        isWarning: true,  // 注意書きとして表示
-        color: '#FF9800'  // オレンジ系
+        isWarning: true,
+        color: '#d6282d'  // Dress Code Error
     }
 };
