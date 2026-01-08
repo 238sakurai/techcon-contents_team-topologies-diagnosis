@@ -4,6 +4,45 @@
  * 10問 Yes/No 形式
  */
 
+/**
+ * X（Twitter）投稿テキスト生成
+ * @param {string} resultType - A, B, C
+ * @returns {string}
+ */
+function buildTweetText(resultType) {
+    const tag = "#srekaigi_dresscode";
+    const templates = {
+        A: `チートポ診断：自律実行型チーム 寄りでした。\n責務がクリアだと運用が回るやつ。\n${tag}`,
+        B: `チートポ診断：横断イネイブリング型 寄りでした。\n横断が増えるほど分断と摩擦が見えやすい。\n${tag}`,
+        C: `チートポ診断：分断・属人化ゾーン 寄りでした。\n問題は人じゃなくて構造、ってやつ。\n${tag}`,
+    };
+
+    let text = templates[resultType] ?? `チートポ診断：結果が出ました。\n${tag}`;
+
+    // 短縮（保険）
+    const MAX = 260;
+    if (text.length > MAX) {
+        text = text.split("\n")[0] + "\n" + tag;
+        if (text.length > MAX) text = text.slice(0, MAX - 1) + "…";
+    }
+    return text;
+}
+
+/**
+ * X投稿画面を開く
+ * @param {string} resultType - A, B, C
+ */
+function openXShare(resultType) {
+    const text = buildTweetText(resultType);
+    const url = location.href.split('?')[0]; // クエリパラメータを除去
+
+    const intent = new URL("https://twitter.com/intent/tweet");
+    intent.searchParams.set("text", text);
+    intent.searchParams.set("url", url);
+
+    window.open(intent.toString(), "_blank", "noopener,noreferrer");
+}
+
 class DiagnosisApp {
     constructor() {
         this.currentQuestion = 0;
@@ -135,6 +174,7 @@ class DiagnosisApp {
         // タイプ判定
         const resultType = determineType(this.scores);
         const typeInfo = teamTypes[resultType];
+        this.currentResultType = resultType; // X投稿用に保持
 
         // 結果画面描画（スクショ映え重視・1画面完結）
         this.elements.resultContent.innerHTML = `
@@ -161,11 +201,25 @@ class DiagnosisApp {
                 </div>
                 
                 <div class="result-footer">
-                    <p class="screenshot-hint">📸 スクショしてXで共有OK！</p>
                     <p class="brand-small">Team Topologies Diagnosis by Dress Code</p>
                 </div>
             </div>
+            
+            <div class="share-section">
+                <button id="share-x-btn" class="btn share-btn" aria-label="結果をXに投稿">
+                    <svg class="x-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    結果をXに投稿
+                </button>
+                <p class="share-note">※投稿内容は編集できます</p>
+            </div>
         `;
+
+        // X投稿ボタンのイベント
+        document.getElementById('share-x-btn').addEventListener('click', () => {
+            openXShare(this.currentResultType);
+        });
 
         this.elements.progress.style.width = '100%';
         this.showScreen('result');
