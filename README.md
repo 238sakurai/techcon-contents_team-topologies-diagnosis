@@ -4,7 +4,7 @@ SREあるある × チーム特性診断 - 10問 Yes/No で、あなたのチー
 
 ## 🌐 デモ
 
-https://saku-ika.github.io/techcon-contents_team-topologies-diagnosis/
+https://238sakurai.github.io/techcon-contents_team-topologies-diagnosis/
 
 ## 📋 概要
 
@@ -101,7 +101,7 @@ Team Topologies の概念をベースに、SRE / Platform Engineering の文脈�
 
 ```bash
 # リポジトリをクローン
-git clone https://github.com/saku-ika/techcon-contents_team-topologies-diagnosis.git
+git clone https://github.com/238sakurai/techcon-contents_team-topologies-diagnosis.git
 cd techcon-contents_team-topologies-diagnosis
 
 # ローカルサーバーを起動（Python 3）
